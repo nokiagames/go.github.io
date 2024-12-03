@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弹跳球</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>弹跳球</h1>
+        <canvas id="gameCanvas" width="320" height="480" style="background-color: #001100;"></canvas>
+        <p><a href="index.html">返回主菜单</a></p>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const ball = { x: 160, y: 240, dx: 2, dy: 2, radius: 10 };
+
+        function updateGame() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) ball.dx *= -1;
+            if (ball.y < ball.radius || ball.y > canvas.height - ball.radius) ball.dy *= -1;
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#00ff00';
+            ctx.fill();
+        }
+
+        function gameLoop() {
+            updateGame();
+            drawGame();
+        }
+
+        setInterval(gameLoop, 10);
+    </script>
+</body>
+</html>
