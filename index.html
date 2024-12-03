@@ -1,171 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nokia Retro Games</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    #game-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    canvas {
-      background-color: #008000; /* 绿色背景 */
-      display: block;
-    }
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      width: 700px;
-      margin-top: 10px;
-    }
-    .button {
-      width: 100px;
-      height: 50px;
-      background: #444;
-      color: white;
-      font-size: 18px;
-      text-align: center;
-      line-height: 50px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .button:hover {
-      background: #666;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nokia Retro Games</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #game-container {
+            width: 300px;
+            height: 600px;
+            background-color: #a3a3a3;
+            border: 10px solid #333;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #nokia-screen {
+            width: 260px;
+            height: 400px;
+            background-color: #b3d233;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 10px;
+            border: 3px solid #333;
+            color: black;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #666;
+            color: #fff;
+            text-align: center;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        canvas {
+            background-color: black;
+            border: 2px solid #333;
+        }
+    </style>
 </head>
 <body>
-  <div id="game-container">
-    <canvas id="gameCanvas" width="700" height="700"></canvas>
-    <div class="buttons">
-      <div class="button" onclick="selectGame('snake')">Snake</div>
-      <div class="button" onclick="selectGame('space')">Space</div>
-      <div class="button" onclick="selectGame('bricks')">Bricks</div>
-      <div class="button" onclick="selectGame('bounce')">Bounce</div>
+    <div id="game-container">
+        <div id="nokia-screen">
+            <div id="menu">
+                <h1>Nokia Games</h1>
+                <div class="button" onclick="startGame('snake')">Snake</div>
+                <div class="button" onclick="startGame('space')">Space Shooter</div>
+                <div class="button" onclick="startGame('bricks')">Bricks</div>
+            </div>
+            <canvas id="game-canvas" class="hidden" width="260" height="400"></canvas>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const menu = document.getElementById('menu');
 
-    // 全局变量
-    let currentGame = null;
-
-    // 主界面
-    function drawMainMenu() {
-      ctx.fillStyle = "#008000"; // 背景绿色
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#FFFFFF"; // 字体白色
-      ctx.font = "30px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("Select a Game", canvas.width / 2, canvas.height / 2 - 50);
-      ctx.fillText("Snake, Space, Bricks, or Bounce", canvas.width / 2, canvas.height / 2);
-    }
-
-    // Snake 游戏
-    function startSnakeGame() {
-      let snake = [{ x: 10, y: 10 }];
-      let direction = { x: 0, y: 0 };
-      const gridSize = 20;
-      const tileCount = canvas.width / gridSize;
-      let apple = { x: 5, y: 5 };
-
-      const moveSnake = () => {
-        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-        snake.unshift(head);
-
-        if (head.x === apple.x && head.y === apple.y) {
-          apple = {
-            x: Math.floor(Math.random() * tileCount),
-            y: Math.floor(Math.random() * tileCount),
-          };
-        } else {
-          snake.pop();
+        function startGame(game) {
+            menu.classList.add('hidden');
+            canvas.classList.remove('hidden');
+            if (game === 'snake') initSnake();
+            else if (game === 'space') initSpaceShooter();
+            else if (game === 'bricks') initBricks();
         }
 
-        // 游戏结束检测
-        if (
-          head.x < 0 ||
-          head.x >= tileCount ||
-          head.y < 0 ||
-          head.y >= tileCount ||
-          snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
-        ) {
-          alert("Game Over");
-          currentGame = null;
-          drawMainMenu();
+        function initSnake() {
+            let snake = [{ x: 10, y: 10 }];
+            let direction = { x: 0, y: 1 };
+            let food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'green';
+                snake.forEach(s => ctx.fillRect(s.x * 10, s.y * 10, 10, 10));
+                ctx.fillStyle = 'red';
+                ctx.fillRect(food.x * 10, food.y * 10, 10, 10);
+            }
+
+            function update() {
+                const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+                if (head.x === food.x && head.y === food.y) {
+                    food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+                } else {
+                    snake.pop();
+                }
+                snake.unshift(head);
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowUp') direction = { x: 0, y: -1 };
+                if (e.key === 'ArrowDown') direction = { x: 0, y: 1 };
+                if (e.key === 'ArrowLeft') direction = { x: -1, y: 0 };
+                if (e.key === 'ArrowRight') direction = { x: 1, y: 0 };
+            });
+
+            setInterval(() => {
+                update();
+                draw();
+            }, 100);
         }
-      };
 
-      const drawSnake = () => {
-        ctx.fillStyle = "#444";
-        snake.forEach(segment => {
-          ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-        });
-      };
-
-      const drawApple = () => {
-        ctx.fillStyle = "red";
-        ctx.fillRect(apple.x * gridSize, apple.y * gridSize, gridSize, gridSize);
-      };
-
-      const gameLoop = () => {
-        if (currentGame === "snake") {
-          ctx.fillStyle = "#008000";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          moveSnake();
-          drawSnake();
-          drawApple();
-          setTimeout(gameLoop, 100);
+        function initSpaceShooter() {
+            ctx.fillStyle = 'white';
+            ctx.fillText('Space Shooter Coming Soon!', 50, 200);
         }
-      };
 
-      window.addEventListener("keydown", e => {
-        switch (e.key) {
-          case "ArrowUp":
-            if (direction.y === 0) direction = { x: 0, y: -1 };
-            break;
-          case "ArrowDown":
-            if (direction.y === 0) direction = { x: 0, y: 1 };
-            break;
-          case "ArrowLeft":
-            if (direction.x === 0) direction = { x: -1, y: 0 };
-            break;
-          case "ArrowRight":
-            if (direction.x === 0) direction = { x: 1, y: 0 };
-            break;
+        function initBricks() {
+            ctx.fillStyle = 'white';
+            ctx.fillText('Bricks Coming Soon!', 50, 200);
         }
-      });
-
-      gameLoop();
-    }
-
-    // 选择游戏
-    function selectGame(game) {
-      currentGame = game;
-      if (game === "snake") {
-        startSnakeGame();
-      } else {
-        alert(`Game ${game} is not implemented yet!`);
-        currentGame = null;
-        drawMainMenu();
-      }
-    }
-
-    // 初始化
-    drawMainMenu();
-  </script>
+    </script>
 </body>
 </html>
