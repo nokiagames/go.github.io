@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nokia Retro Games</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: black;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+        }
+        #game-screen {
+            width: 900px;
+            height: 900px;
+            background: #00FF00;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        #buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .button {
+            width: 80px;
+            height: 80px;
+            margin: 5px;
+            background: #2F4F4F;
+            border: 3px solid black;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .button:active {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-screen">
+        <canvas id="canvas" width="900" height="900"></canvas>
+    </div>
+    <div id="buttons">
+        <div class="button" id="up">↑</div>
+        <div class="button" id="left">←</div>
+        <div class="button" id="ok">OK</div>
+        <div class="button" id="right">→</div>
+        <div class="button" id="down">↓</div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
