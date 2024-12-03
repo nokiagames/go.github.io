@@ -1,61 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nokia Retro Games</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: black;
-            margin: 0;
-            font-family: 'Courier New', monospace;
-        }
-        #game-screen {
-            width: 900px;
-            height: 900px;
-            background: #00FF00;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        #buttons {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-        .button {
-            width: 80px;
-            height: 80px;
-            margin: 5px;
-            background: #2F4F4F;
-            border: 3px solid black;
-            color: white;
-            font-size: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-        .button:active {
-            background: #555;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nokia Retro Games</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      background-color: #008000; /* 绿色背景 */
+      display: block;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      width: 700px;
+      margin-top: 10px;
+    }
+    .button {
+      width: 100px;
+      height: 50px;
+      background: #444;
+      color: white;
+      font-size: 18px;
+      text-align: center;
+      line-height: 50px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background: #666;
+    }
+  </style>
 </head>
 <body>
-    <div id="game-screen">
-        <canvas id="canvas" width="900" height="900"></canvas>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="700" height="700"></canvas>
+    <div class="buttons">
+      <div class="button" onclick="selectGame('snake')">Snake</div>
+      <div class="button" onclick="selectGame('space')">Space</div>
+      <div class="button" onclick="selectGame('bricks')">Bricks</div>
+      <div class="button" onclick="selectGame('bounce')">Bounce</div>
     </div>
-    <div id="buttons">
-        <div class="button" id="up">↑</div>
-        <div class="button" id="left">←</div>
-        <div class="button" id="ok">OK</div>
-        <div class="button" id="right">→</div>
-        <div class="button" id="down">↓</div>
-    </div>
-    <script src="script.js"></script>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // 全局变量
+    let currentGame = null;
+
+    // 主界面
+    function drawMainMenu() {
+      ctx.fillStyle = "#008000"; // 背景绿色
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#FFFFFF"; // 字体白色
+      ctx.font = "30px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Select a Game", canvas.width / 2, canvas.height / 2 - 50);
+      ctx.fillText("Snake, Space, Bricks, or Bounce", canvas.width / 2, canvas.height / 2);
+    }
+
+    // Snake 游戏
+    function startSnakeGame() {
+      let snake = [{ x: 10, y: 10 }];
+      let direction = { x: 0, y: 0 };
+      const gridSize = 20;
+      const tileCount = canvas.width / gridSize;
+      let apple = { x: 5, y: 5 };
+
+      const moveSnake = () => {
+        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+        snake.unshift(head);
+
+        if (head.x === apple.x && head.y === apple.y) {
+          apple = {
+            x: Math.floor(Math.random() * tileCount),
+            y: Math.floor(Math.random() * tileCount),
+          };
+        } else {
+          snake.pop();
+        }
+
+        // 游戏结束检测
+        if (
+          head.x < 0 ||
+          head.x >= tileCount ||
+          head.y < 0 ||
+          head.y >= tileCount ||
+          snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+        ) {
+          alert("Game Over");
+          currentGame = null;
+          drawMainMenu();
+        }
+      };
+
+      const drawSnake = () => {
+        ctx.fillStyle = "#444";
+        snake.forEach(segment => {
+          ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+        });
+      };
+
+      const drawApple = () => {
+        ctx.fillStyle = "red";
+        ctx.fillRect(apple.x * gridSize, apple.y * gridSize, gridSize, gridSize);
+      };
+
+      const gameLoop = () => {
+        if (currentGame === "snake") {
+          ctx.fillStyle = "#008000";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          moveSnake();
+          drawSnake();
+          drawApple();
+          setTimeout(gameLoop, 100);
+        }
+      };
+
+      window.addEventListener("keydown", e => {
+        switch (e.key) {
+          case "ArrowUp":
+            if (direction.y === 0) direction = { x: 0, y: -1 };
+            break;
+          case "ArrowDown":
+            if (direction.y === 0) direction = { x: 0, y: 1 };
+            break;
+          case "ArrowLeft":
+            if (direction.x === 0) direction = { x: -1, y: 0 };
+            break;
+          case "ArrowRight":
+            if (direction.x === 0) direction = { x: 1, y: 0 };
+            break;
+        }
+      });
+
+      gameLoop();
+    }
+
+    // 选择游戏
+    function selectGame(game) {
+      currentGame = game;
+      if (game === "snake") {
+        startSnakeGame();
+      } else {
+        alert(`Game ${game} is not implemented yet!`);
+        currentGame = null;
+        drawMainMenu();
+      }
+    }
+
+    // 初始化
+    drawMainMenu();
+  </script>
 </body>
 </html>
